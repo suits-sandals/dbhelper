@@ -1,0 +1,23 @@
+{
+  "name": "sas-dbhelper",
+  "version": "0.1.0",
+  "description": "A simple Mongo and redis wrapper.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/suits-sandals/dbhelper.git"
+  },
+  "author": "Suits & Sandals",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/suits-sandals/dbhelper/issues"
+  },
+  "homepage": "https://github.com/suits-sandals/dbhelper#readme",
+  "dependencies": {
+    "mongodb": "^3.0.6",
+    "redis": "^2.8.0"
+  }
+}
