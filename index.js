@@ -1,4 +1,4 @@
-import mongodb from 'mongodb'
+var mongodb = require('mongodb');
 var redis = require('redis'),
     client = redis.createClient();
 
