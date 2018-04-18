@@ -159,9 +159,10 @@ module.exports = class Dbhelper {
   }
 
   updateOne (query, data, cb, options = {}) {
-
+    console.log("162", data);
     let mongoQuery = (query, data, options, cb) => {
       let url = this.url;
+      console.log(data);
 
       MongoClient.connect(url, (err, client) => {
         if (err) throw err;
@@ -174,7 +175,7 @@ module.exports = class Dbhelper {
         let filter = {};
         filter["$set"] = data;
 
-        collection.updateOne(query, options, filter, function (err, obj) {
+        collection.updateOne(query, filter, options, function (err, obj) {
           if (err) throw err;
 
           obj == null ? cb(false) : cb(obj);
@@ -182,7 +183,7 @@ module.exports = class Dbhelper {
       });
     };
 
-    let redisQuery = (query, options, cb) => {
+    let redisQuery = (query, data, options, cb) => {
       client.get(options.key, function (err, reply) {
         switch (true) {
           case err:
@@ -191,7 +192,7 @@ module.exports = class Dbhelper {
           case !reply:
             let key = options.key;
 
-            mongoQuery(query, options, function (data) {
+            mongoQuery(query, data, options, function (data) {
               let dataString = JSON.stringify(data);
               client.set(key, dataString, 'EX', 84600);
               cb(data);
@@ -204,12 +205,12 @@ module.exports = class Dbhelper {
     };
 
     if (Object.keys(options).length == 0 || options.cache == 0) {
-      mongoQuery(query, options, function (payload) {
+      mongoQuery(query, data, options, function (payload) {
         cb(payload);
       });
     } else if (options.cache == 1) {
       if (!options.key) throw new Error("Cache key not present.");
-      redisQuery(query, options, function (payload) {
+      redisQuery(query, data, options, function (payload) {
         cb(payload);
       });
     }
