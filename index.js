@@ -159,10 +159,9 @@ module.exports = class Dbhelper {
   }
 
   updateOne (query, data, cb, options = {}) {
-    console.log("162", data);
+    
     let mongoQuery = (query, data, options, cb) => {
       let url = this.url;
-      console.log(data);
 
       MongoClient.connect(url, (err, client) => {
         if (err) throw err;
