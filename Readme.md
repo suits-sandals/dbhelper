@@ -1,10 +1,10 @@
-
-
-
 # DB Helper
 
-Db helper is a lightweight wrapper for common db actions that wraps around MongoDB and Redis.
+Db helper is a lightweight wrapper for common db actions that wraps around MongoDB and Redis. Developed internally by the Suits & Sandals team.
 
+### Warning
+
+Db helper is currently in beta and not suitable for production.
 
 ### Prerequisites
 
@@ -23,7 +23,7 @@ Db helper will also require you to install and run mongodb. For instructions on 
 
 ### Installing
 
-Now that db helper's dependencies have been installed download and install the db helper npm package to your local project.
+Now that Db helper's dependencies have been installed download and install the db helper npm package to your local project.
 
 ```
 npm install dbhelper --save
@@ -42,13 +42,15 @@ require('Dbhelper');
 Then create a dbhelper object and pass in your Mongo connection url & database name like so:
 
 ```
-var dbhelper = new Dbhelpler('YOUR MONGO URL', 'YOUR DBNAME');
+var User = new Dbhelpler('YOUR MONGO URL', 'YOUR DBNAME');
 ```
 Db helper comes bundled with database query wrappers for Mongo and Redis. When Redis querying is turned on, db helper will use Redis as a cache: Querying Redis first for the data, and if it not present querying mongo for the data. If data is found in mongo, db helper will cache it to Redis for future requests.
 
 Since, Db helper is wrapped around the Mongo native driver for node as such, many of the commands will be similar to Mongo native API with one exception: Db helper expects all commands to be passed with a callback to return the data to your app.
 
-Because Db helper is a schema-less wrapper, you must be thoughtful of how you store data in Mongo and Redis to ensure consistent data.
+~Because Db helper is a schema-less wrapper, you must be thoughtful of how you store data in Mongo and Redis to ensure consistent data.~
+
+Optional schema API available as of version 0.2.0
 
 ### Available Commands
 
@@ -61,7 +63,7 @@ To use caching for find, findOne, updateOne, & deleteOne commands you must pass 
 To run a find query using db helper WITHOUT caching use:
 
 ```
-dbhelper.find(query = {email: "auniquemail@gmail.com", collection: "users"}, options, callback);
+User.find(query = {email: "auniquemail@gmail.com", collection: "users"}, options, callback);
 
 //Returns data as an object
 ```
@@ -69,7 +71,7 @@ dbhelper.find(query = {email: "auniquemail@gmail.com", collection: "users"}, opt
 To run a find query WITH caching use:
 
 ```
-dbhelper.find(query = {email: "auniquemail@gmail.com", collection: "users"}, options = {cache: 1, key: "auniquemail@gmail.com"}, callback);
+User.find(query = {email: "auniquemail@gmail.com", collection: "users"}, options = {cache: true, key: "auniquemail@gmail.com"}, callback);
 
 //Returns data as an object
 ```
@@ -79,7 +81,7 @@ dbhelper.find(query = {email: "auniquemail@gmail.com", collection: "users"}, opt
 To run a find query using db helper WITHOUT caching use:
 
 ```
-dbhelper.findOne(query = {email: "auniquemail@gmail.com", collection: "users"}, options, callback);
+User.findOne(query = {email: "auniquemail@gmail.com", collection: "users"}, options, callback);
 
 //Returns data as an object
 ```
@@ -87,17 +89,29 @@ dbhelper.findOne(query = {email: "auniquemail@gmail.com", collection: "users"}, 
 To run a find query WITH caching use:
 
 ```
-dbhelper.findOne(query = {email: "auniquemail@gmail.com", collection: "users"}, options = {cache: 1, key: "auniquemail@gmail.com"}, callback);
+User.findOne(query = {email: "auniquemail@gmail.com", collection: "users"}, options = {cache: true, key: "auniquemail@gmail.com"}, callback);
 
 //Returns data as an object
 ```
+
+#### findOrCreate
+
+This command will return two things: A boolean indicating whether or not your object was saved to the db & the object that was found/saved.
+
+To run a find or create query using Db helper use:
+
+```
+User.findOrCreate({email: 'auniquemail@gmail.com', collection: 'user'}, data, callback)
+```
+
+The variable ```data```, in this example, is what we want to save to the database should the object not be found.
 
 #### updateOne
 
 To run an update query using db helper WITHOUT caching use:
 
 ```
-dbhelper.updateOne(query = {email: "auniquemail@gmail.com", collection: "users"}, data = {email: "notauniqueemail@gmail.com"}, options, callback);
+User.updateOne(query = {email: "auniquemail@gmail.com", collection: "users"}, data = {email: "notauniqueemail@gmail.com"}, options, callback);
 
 //Returns modified data as an object
 ```
@@ -105,7 +119,7 @@ dbhelper.updateOne(query = {email: "auniquemail@gmail.com", collection: "users"}
 To run a find query WITH caching use:
 
 ```
-dbhelper.updateOne(query = {email: "auniquemail@gmail.com", collection: "users"}, data = {email: "notauniqueemail@gmail.com"}, options = {cache: 1, key: "auniquemail@gmail.com"}, callback);
+User.updateOne(query = {email: "auniquemail@gmail.com", collection: "users"}, data = {email: "notauniqueemail@gmail.com"}, options = {cache: true, key: "auniquemail@gmail.com"}, callback);
 
 //Returns modified data as an object
 ```
@@ -115,11 +129,31 @@ dbhelper.updateOne(query = {email: "auniquemail@gmail.com", collection: "users"}
 To delete an object from your db WITHOUT caching use:
 
 ```
-dbhelper.deleteOne(query = {email: "auniquemail@gmail.com", collection: "users"}, options, callback);
+User.deleteOne(query = {email: "auniquemail@gmail.com", collection: "users"}, options, callback);
 ```
 
 To delete an object from your db WITH caching use:
 
 ```
-dbhelper.deleteOne(query = {email: "auniquemail@gmail.com", collection: "users"}z, options = {cache: 1, key: "auniquemail@gmail.com"}, callback);
+User.deleteOne(query = {email: "auniquemail@gmail.com", collection: "users"}, options = {cache: true, key: "auniquemail@gmail.com"}, callback);
+```
+
+### Schemas
+
+As of version 0.2.0 of Db helper, you are now free to define a schema object and have it enforced against any query that creates or updates. To define a schema first create an object like so:
+
+```
+let mySchemaObj = {
+  email: 'string',
+  password: {required: 'true', type: 'string'},
+  phone: 'number'
+}
+
+User.schema(mySchemaObj);
+```
+
+Now to enforce schema, pass an options object in whatever create or update query you're making like so:
+
+```
+User.updateOne(query = {email: "auniquemail@gmail.com", collection: "users"}, data = {email: "notauniqueemail@gmail.com"}, options = {schema: true}, callback);
 ```

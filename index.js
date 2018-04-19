@@ -10,6 +10,40 @@ module.exports = class Dbhelper {
     this.dbName = dbName;
   }
 
+  schema (schemaObj) {
+    this.schema = schemaObj;
+  }
+
+  validate (obj) {
+    let schema = this.schema;
+    let schemaKeys = Object.keys(schema);
+    let objKeys = Object.keys(obj);
+
+    schemaKeys.forEach(key => {// Validates optional rules
+      if (schema[key].includes('{')) {
+        let schemaKey = JSON.parse(schema[key])
+        if (schemaKey.required) {
+          if(objKeys.indexOf(key) === -1){
+            throw new Error(`Schema validation error. Missing required key of '${key}'`)
+          }
+        }
+      }
+    });
+
+    objKeys.forEach(key => { //Validates data types
+      if (this.schema[key] == undefined) {
+        throw new Error(`Schema validation error. '${key}' not found in the Schema`);
+      } else if (schema[key].includes('{')) {
+        let schemaKey = JSON.parse(schema[key])
+        return obj[key] !== schemaKey.type ? new Error(`Data type mismatch. Data for '${key}' is not a ${this.schema[key]}`): null;
+      } else {
+        return obj[key] !== schema[key] ? new Error(`Data type mismatch. Data for '${key}' is not a ${this.schema[key]}`): null;
+      }
+    });
+
+
+  }
+
   find (query = {}, cb, options = {}) {
 
     let mongoQuery = (query, options, cb) => {
@@ -40,7 +74,6 @@ module.exports = class Dbhelper {
             break;
           case !reply:
             let key = options.key;
-
             mongoQuery(query, options, function (data) {
               let dataString = JSON.stringify(data);
               client.set(key, dataString, 'EX', 84600);
@@ -57,7 +90,7 @@ module.exports = class Dbhelper {
       mongoQuery(query, options, function (payload) {
         cb(payload);
       });
-    } else if (options.cache == 1) {
+    } else if (options.cache) {
       if (!options.key) throw new Error("Cache key not present.");
       redisQuery(query, options, function (payload) {
         cb(payload);
@@ -112,7 +145,7 @@ module.exports = class Dbhelper {
       mongoQuery(query, options, function (payload) {
         cb(payload);
       });
-    } else if (options.cache == 1) {
+    } else if (options.cache) {
       if (!options.key) throw new Error("Cache key not present.");
       redisQuery(query, options, function (payload) {
         cb(payload);
@@ -122,9 +155,9 @@ module.exports = class Dbhelper {
 
   findOrCreate (query, data, cb, options = {}) {
 
-    if (Object.keys(options).length == 0 || options.cache == 0) {
-      let url = this.url;
+    if (options.cache == undefined) {
 
+      let url = this.url;
       MongoClient.connect(url, (err, client) => {
         if (err) throw err;
 
@@ -133,6 +166,10 @@ module.exports = class Dbhelper {
         let collection = db.collection(query.collection);
         ['collection'].forEach(key => delete query[key]);
         ['cache', 'key'].forEach(key => delete options[key]);
+
+        if (options.schema) {
+          this.validate(data);
+        }
 
         collection.findOne(query, options, function (err, obj) {
 
@@ -159,7 +196,7 @@ module.exports = class Dbhelper {
   }
 
   updateOne (query, data, cb, options = {}) {
-    
+
     let mongoQuery = (query, data, options, cb) => {
       let url = this.url;
 
@@ -171,6 +208,11 @@ module.exports = class Dbhelper {
         let collection = db.collection(query.collection);
         ['collection'].forEach(key => delete query[key]);
         ['cache', 'key'].forEach(key => delete options[key]);
+
+        if (options.schema) {
+          this.validate(data);
+        }
+
         let filter = {};
         filter["$set"] = data;
 
@@ -207,7 +249,7 @@ module.exports = class Dbhelper {
       mongoQuery(query, data, options, function (payload) {
         cb(payload);
       });
-    } else if (options.cache == 1) {
+    } else if (options.cache) {
       if (!options.key) throw new Error("Cache key not present.");
       redisQuery(query, data, options, function (payload) {
         cb(payload);
@@ -215,9 +257,9 @@ module.exports = class Dbhelper {
     }
   }
 
-  deleteOne (query, cb = null, options = {}) {
+  deleteOne (query, cb, options = {}) {
 
-    let mongoQuery = (query, data, options, cb) => {
+    let mongoQuery = (query, options, cb) => {
       let url = this.url;
 
       MongoClient.connect(url, (err, client) => {
@@ -228,10 +270,8 @@ module.exports = class Dbhelper {
         let collection = db.collection(query.collection);
         ['collection'].forEach(key => delete query[key]);
         ['cache', 'key'].forEach(key => delete options[key]);
-        let filter = {};
-        filter["$set"] = data;
 
-        collection.updateOne(query, options, filter, function (err, obj) {
+        collection.deleteOne(query, function (err, obj) {
           if (err) throw err;
 
           obj == null ? cb(false) : cb(obj);
@@ -248,7 +288,7 @@ module.exports = class Dbhelper {
       mongoQuery(query, options, function (payload) {
         cb(payload);
       });
-    } else if (options.cache == 1) {
+    } else if (options.cache) {
       if (!options.key) throw new Error("Cache key not present.");
       redisQuery(query, options, function (payload) {
         cb(payload);
