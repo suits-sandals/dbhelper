@@ -1,6 +1,6 @@
 # DB Helper
 
-Db helper is a lightweight wrapper for common db actions that wraps around MongoDB and Redis. Developed internally by the Suits & Sandals team.
+Db helper is a lightweight wrapper for common db actions that wraps around MongoDB and uses Redis for caching. Db helper is a project package by the [Suits & Sandals](https://suits-sandals.com/) team.
 
 ### Warning
 
@@ -19,7 +19,7 @@ Once installed run the following command:
 redis-server
 ```
 
-Db helper will also require you to install and run mongodb. For instructions on setting that up visit the MongoDb docs here: [https://docs.mongodb.com/manual/installation/]
+Db helper will also require you to install and run mongodb. For instructions on setting that up visit the MongoDb docs here: (https://docs.mongodb.com/manual/installation/)
 
 ### Installing
 
