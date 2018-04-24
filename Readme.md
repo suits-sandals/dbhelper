@@ -46,9 +46,9 @@ var User = new Dbhelpler('YOUR MONGO URL', 'YOUR DBNAME');
 ```
 Db helper comes bundled with database query wrappers for Mongo and Redis. When Redis querying is turned on, db helper will use Redis as a cache: Querying Redis first for the data, and if it not present querying mongo for the data. If data is found in mongo, db helper will cache it to Redis for future requests.
 
-Since, Db helper is wrapped around the Mongo native driver for node as such, many of the commands will be similar to Mongo native API with one exception: Db helper expects all commands to be passed with a callback to return the data to your app.
+Since Db helper is wrapped around the Mongo native driver for Node, many of the commands will be similar to Mongo native API with one exception: Db helper expects all commands to be passed with a callback to return the data to your app.
 
-~Because Db helper is a schema-less wrapper, you must be thoughtful of how you store data in Mongo and Redis to ensure consistent data.~
+~~Because Db helper is a schema-less wrapper, you must be thoughtful of how you store data in Mongo and Redis to ensure consistent data.~~
 
 Optional schema API available as of version 0.2.0
 
@@ -146,9 +146,13 @@ As of version 0.2.0 of Db helper, you are now free to define a schema object and
 let mySchemaObj = {
   email: 'string',
   password: {required: 'true', type: 'string'},
-  phone: 'number'
+  phone: {type: 'number', default: '5515555555'}
 }
 
+```
+Then pass your schema object to your declared Db helper object like so:
+
+```
 User.schema(mySchemaObj);
 ```
 

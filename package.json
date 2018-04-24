@@ -1,7 +1,7 @@
 {
   "name": "sas-dbhelper",
-  "version": "0.2.2",
-  "description": "A simple Mongo and redis wrapper.",
+  "version": "0.2.5",
+  "description": "A lightweight MongoDB wrapper with Redis caching built-in.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

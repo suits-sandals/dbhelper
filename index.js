@@ -22,10 +22,12 @@ module.exports = class Dbhelper {
     schemaKeys.forEach(key => {// Validates optional rules
       if (schema[key].includes('{')) {
         let schemaKey = JSON.parse(schema[key])
-        if (schemaKey.required) {
-          if(objKeys.indexOf(key) === -1){
-            throw new Error(`Schema validation error. Missing required key of '${key}'`)
-          }
+        if (schemaKey.required && objKeys.indexOf(key) === -1) {
+          throw new Error(`Schema validation error. Missing required key of '${key}'`);
+        }
+
+        if (schemaKey.default && (obj[key] == undefined || obj[key].length == 0)) {
+          obj[key] = schemaKey.default;
         }
       }
     });
@@ -40,7 +42,6 @@ module.exports = class Dbhelper {
         return obj[key] !== schema[key] ? new Error(`Data type mismatch. Data for '${key}' is not a ${this.schema[key]}`): null;
       }
     });
-
 
   }
 
