@@ -57,7 +57,7 @@ module.exports = class Dbhelper {
         let db = client.db(dbName);
         let collection = db.collection(query.collection);
         ['collection'].forEach(key => delete query[key]);
-        ['cache', 'key'].forEach(key => delete options[key]);
+        ['cache', 'key', 'schema'].forEach(key => delete options[key]);
 
         collection.find(query, options).toArray(function (err, data) {
           if (err) throw err;
@@ -111,7 +111,7 @@ module.exports = class Dbhelper {
         let db = client.db(dbName);
         let collection = db.collection(query.collection);
         ['collection'].forEach(key => delete query[key]);
-        options ? ['cache', 'key'].forEach(key => delete options[key]) : options = {};
+        options ? ['cache', 'key', 'schema'].forEach(key => delete options[key]) : options = {};
 
         collection.findOne(query, options, function (err, obj) {
           if (err) throw err;
@@ -166,7 +166,7 @@ module.exports = class Dbhelper {
         let db = client.db(dbName);
         let collection = db.collection(query.collection);
         ['collection'].forEach(key => delete query[key]);
-        ['cache', 'key'].forEach(key => delete options[key]);
+        ['cache', 'key', 'schema'].forEach(key => delete options[key]);
 
         if (options.schema) {
           this.validate(data);
@@ -208,7 +208,7 @@ module.exports = class Dbhelper {
         let db = client.db(dbName);
         let collection = db.collection(query.collection);
         ['collection'].forEach(key => delete query[key]);
-        ['cache', 'key'].forEach(key => delete options[key]);
+        ['cache', 'key', 'schema'].forEach(key => delete options[key]);
 
         if (options.schema) {
           this.validate(data);
@@ -270,7 +270,7 @@ module.exports = class Dbhelper {
         let db = client.db(dbName)
         let collection = db.collection(query.collection);
         ['collection'].forEach(key => delete query[key]);
-        ['cache', 'key'].forEach(key => delete options[key]);
+        ['cache', 'key', 'schema'].forEach(key => delete options[key]);
 
         collection.deleteOne(query, function (err, obj) {
           if (err) throw err;
@@ -308,7 +308,7 @@ module.exports = class Dbhelper {
       let db = client.db(dbName);
       let collection = db.collection(query.collection);
       ['collection'].forEach(key => delete query[key]);
-      ['cache', 'key'].forEach(key => delete options[key]);
+      ['cache', 'key', 'schema'].forEach(key => delete options[key]);
 
       collection.deleteMany({}, options, function (err, obj) {
         if (err) throw err;

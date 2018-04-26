@@ -56,7 +56,7 @@ Optional schema API available as of version 0.2.0
 
 The following commands are available to you: find, findOne, findOrCreate (no caching), updateOne, deleteOne, deleteMany (no caching)
 
-To use caching for find, findOne, updateOne, & deleteOne commands you must pass in the options object with cache set to 1 and the name of the key you'd like to get or set in case that the value does not yet exist with your Redis db. You may also pass in other options in accordance to Mongo Native's docs but they will only be executed in your for Mongo and not Redis.
+To use caching for find, findOne, updateOne, & deleteOne commands you must pass in the options object with a key 'cache' set to 'true'. You will also need to name the key you'd like to [get]('https://redis.io/commands/get') or [set]('https://redis.io/commands/set') in case that the value does not yet exist in your Redis instance. You may also pass in other options in accordance to [Mongo Native's docs]('http://mongodb.github.io/node-mongodb-native/3.0/api/').
 
 #### find
 

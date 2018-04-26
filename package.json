@@ -1,6 +1,6 @@
 {
   "name": "sas-dbhelper",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "A lightweight MongoDB wrapper with Redis caching built-in.",
   "main": "index.js",
   "scripts": {
